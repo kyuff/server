@@ -1,7 +1,7 @@
 {
     "name": "server",
-    "version": "0.1",
-    "main": "dev",
+    "version": "0.0.1",
+    "main": "server.js",
     "description": "An enviroment for my Web development",
     "keywords": [
         "server",
@@ -20,6 +20,10 @@
         "url": "git@github.com:kyuff/dev-server.git"
     },
     "engines": {
-        "node": ">=0.8.9"
+        "node": "*"
+    },
+    "dependencies": {
+        "mustache" : ">= 0.7.0",
+        "path"     : ">= 0.4.9"
     }
 }
