@@ -1,0 +1,25 @@
+{
+    "name": "server",
+    "version": "0.1",
+    "main": "dev",
+    "description": "An enviroment for my Web development",
+    "keywords": [
+        "server",
+        "node",
+        "web",
+        "html"
+    ],
+    "author": {
+        "name": "Søren Kyndi-Wiuff",
+        "web": "http://github.com/kyuff",
+        "twitter": "kyuff"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:kyuff/dev-server.git"
+    },
+    "engines": {
+        "node": ">=0.8.9"
+    }
+}
