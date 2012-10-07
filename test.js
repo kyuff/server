@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 
-var server = require('./server');
+var Handler = require('./lib/handler.js').Handler;
+var stuff = 'taget fra test.js';
 
-server.serve('./web', 8080);
+function doodle () {
+    console.log('other stuff');
+}
+var h1 = new Handler(new RegExp('abc'), function () {
+    console.log(stuff);
+});
+
+if( h1.match('myabcstuff') ) {
+    h1.run();
+}
