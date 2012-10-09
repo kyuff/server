@@ -25,14 +25,16 @@
         }
         sass.render(scope.basePath + result.url, libs, function(err, css) {
             if (err) {
-                res.writeHead(500, {'Content-Type': 'text/plain'});
-                res.end(""+err);
+                sendResponse(res,500,'text/plain', err);
             } else {
-                res.writeHead(200, {'Content-Type': 'text/css'});
-                res.end(data);
+                sendResponse(res,200, 'text/css', data);
             }
             done(result);
         });
+    }
+    function sendResponse(res, status, mimeType, msg) {
+        res.writeHead(status, {'Content-Type': mimeType});
+        res.end(msg);
     }
     function mustacheTemplate(req, res) {
         var files = indexer.indexFiles(scope.basePath);
@@ -40,22 +42,30 @@
             js : indexer.replaceList(scope.basePath, '', files['js']),
             css : indexer.replaceList(scope.basePath, '', files['scss'])
         };
+        fs.readFile(scope.basePath + req.url, 'UTF-8', function(err, data) {
+            if( err ) { 
+                sendResponse(res, 500,'text/plain', err);
+            } else {
+                sendResponse(res, 200, 'text/html; charset=UTF-8',mustache.to_html(data, model));
+            }
+        });
         var data = fs.readFileSync(scope.basePath + req.url, 'UTF-8');
-        res.writeHead(200, {'Content-Type':'text/html; charset=UTF-8'});
-        res.end(mustache.to_html(data, model));
+
     }
     function staticFiles(req, res) {
         var path = scope.basePath + req.url;
         fs.readFile(path, 'UTF-8', function(err, data){
             if( err ) {
-                res.writeHead(404, {'Content-Type':'text/plain'});
-                var msg = 'Could not find ' + req.url + "\nError; " + err;
-                res.end(msg);
+                sendResponse( res, 404, 'text/plain', "Cout find " + req.url +"\nError: " + err);
             } else {
-                res.writeHead(200, {'Content-Type':mime.lookup(path)});
-                res.end(data);
+                sendResponse(res, 200, mime.lookup(path), data);
             }
         });
+    }
+    function serve404(req, res) {
+        res.writeHead(404, {'Content-Type': 'text/plain'});
+        var msg404 = ""+req.url + " findes ikke";
+        res.end(msg404);
     }
     function handleRequest(req, res) {
         var matched = false;
@@ -69,7 +79,7 @@
         });
 
         if( !matched ) {
-            staticFiles(req,res);
+            serve404(req,res);
         }
     }
 
@@ -98,6 +108,12 @@
         );
     };
     scope.registerHandler = function(pattern, handler) {
-        handlers[pattern] = handler;
+        scope.addHandler(new Handler(pattern, handler));
     };
+    scope.addHandler = function (handler) {
+        handlers.push(handler);
+    };
+    scope.handleMustache = function() { scope.addHandler(new Handler('.*.html', mustacheTemplate)); };
+    scope.handleScss     = function() { scope.addHandler(new Handler('.*.scss', scssTemplate)); };
+
 })(exports)
